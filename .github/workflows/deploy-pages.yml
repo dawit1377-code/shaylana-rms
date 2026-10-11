@@ -22,6 +22,20 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Validate inline JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r'<script\b[^>]*>([\s\S]*?)</script>', html, re.I)
+          modules = [s for tag, s in re.findall(r'(<script\b[^>]*>)([\s\S]*?)</script>', html, re.I) if 'type="module"' in tag.lower()]
+          if len(modules) != 1:
+              raise SystemExit(f"Expected exactly one inline module script; found {len(modules)}")
+          Path("/tmp/shaylana-rms-check.mjs").write_text(modules[0], encoding="utf-8")
+          print(f"Extracted module script ({len(modules[0])} characters) for Node syntax validation.")
+          PY
+          node --check /tmp/shaylana-rms-check.mjs
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
