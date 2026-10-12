@@ -60,5 +60,34 @@ $('#ordertype')?.addEventListener('change',()=>{$('#tablewrap').style.display=$(
 $('#submitcart').onclick=async()=>{if(!cart.length){alert('Please add at least one item.');return}const payload=cart.map(x=>({menu_item_id:x.menu_item_id,quantity:x.quantity}));try{let r;if(billId)r=await db.rpc('rms_add_order_items',{p_bill_id:billId,p_items:payload});else{const type=$('#ordertype').value,tableId=type==='dine_in'?$('#ordertable').value:null;if(type==='dine_in'&&!tableId){alert('Please select a dining table.');return}r=await db.rpc('rms_create_order',{p_order_type:type,p_table_id:tableId||null,p_notes:$('#ordernotes').value,p_items:payload})}if(r.error)throw r.error;alert(billId?'Items added. New total: '+money(r.data.total):'Order ORD-'+r.data.order_number+' created. Bill total: '+money(r.data.total));work.innerHTML='';await render()}catch(e){alert('Could not save: '+(e.message||String(e)))}};
 }
 draw()}
-let realtimeChannels=[];function connectRealtime(){for(const ch of realtimeChannels)db.removeChannel(ch);realtimeChannels=[];if(!restaurant)return;const tables=['menu_categories','menu_items','dining_tables','orders','order_items','bills','payments','cashier_shifts','ingredients','stock_movements','admin_notifications'];for(const table of tables){const ch=db.channel('rms-'+table+'-'+restaurant.id).on('postgres_changes',{event:'*',schema:'public',table,filter:'restaurant_id=eq.'+restaurant.id},()=>{if(!document.hidden)render()}).subscribe();realtimeChannels.push(ch)}}document.addEventListener('visibilitychange',()=>{if(!document.hidden&&user&&restaurant)render()});db.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){user=null;login()}});await start();
+let realtimeChannels=[];function connectRealtime(){for(const ch of realtimeChannels)db.removeChannel(ch);realtimeChannels=[];if(!restaurant)return;const tables=['menu_categories','menu_items','dining_tables','orders','order_items','bills','payments','cashier_shifts','ingredients','stock_movements','admin_notifications'];for(const table of tables){const ch=db.channel('rms-'+table+'-'+restaurant.id).on('postgres_changes',{event:'*',schema:'public',table,filter:'restaurant_id=eq.'+restaurant.id},()=>{if(!document.hidden)render()}).subscribe();realtimeChannels.push(ch)}}document.addEventListener('visibilitychange',()=>{if(!document.hidden&&user&&restaurant)render()});db.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){user=null;login()}});
+// Delegated, capture-phase action handling: survives rerenders and older browsers.
+document.addEventListener('click',async function(e){
+ const btn=e.target&&e.target.closest?e.target.closest('[data-approveorder],[data-cancelorder],[data-waiteraccept]'):null;
+ if(!btn)return;
+ e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+ if(btn.dataset.busy==='1')return;
+ const approveId=btn.getAttribute('data-approveorder'),cancelId=btn.getAttribute('data-cancelorder'),collectId=btn.getAttribute('data-waiteraccept');
+ const feedback=approveId?document.getElementById('approval-'+approveId):null;
+ let reason=null;
+ if(cancelId){reason=window.prompt('Why are you cancelling this order?','Customer changed order');if(reason===null)return;}
+ const oldText=btn.textContent;btn.dataset.busy='1';btn.disabled=true;
+ if(approveId){btn.textContent='Approving…';if(feedback){feedback.textContent='Sending approval request…';feedback.className='approval-feedback';}}
+ if(cancelId)btn.textContent='Cancelling…';if(collectId)btn.textContent='Accepting…';
+ try{
+  let result;
+  if(approveId)result=await db.rpc('rms_approve_order',{p_order_id:approveId});
+  else if(cancelId)result=await db.rpc('rms_cancel_order',{p_order_id:cancelId,p_reason:reason});
+  else result=await db.rpc('rms_update_station_item',{p_item_id:collectId,p_station_status:'collected',p_assigned_chef:null});
+  if(result&&result.error)throw result.error;
+  note(approveId?'Order approved and released to stations.':cancelId?'Order cancelled.':'Ready item accepted.');
+  await render();
+ }catch(err){
+  const msg=err&&(err.message||err.details||err.hint)||String(err);
+  if(feedback){feedback.textContent=(approveId?'Approval failed: ':'')+msg;feedback.className='approval-feedback error';}
+  else alert((cancelId?'Could not cancel order: ': 'Could not accept item: ')+msg);
+  btn.disabled=false;btn.dataset.busy='0';btn.textContent=approveId?'Retry approval':cancelId?'Retry cancel':'Retry accept';
+ }
+},true);
+await start();
 </script></body></html>
