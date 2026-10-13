@@ -68,6 +68,31 @@ tr:last-child td{border-bottom:0}
 @media(max-width:900px){.layout{grid-template-columns:190px minmax(0,1fr)}main{padding:18px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.top{position:relative;padding:13px 15px;align-items:flex-start;flex-wrap:wrap}.layout{display:block;min-height:0}aside{padding:10px 12px;border-right:0;border-bottom:1px solid var(--line)}.nav{display:flex;overflow-x:auto;padding-bottom:3px}.nav button{white-space:nowrap;flex:0 0 auto}main{padding:15px}.head{flex-direction:column;align-items:stretch}.stats{gap:10px}.card{padding:15px;border-radius:13px}.developer-hero:after{right:-150px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* Final visual correction: premium midnight-blue + champagne palette; login mark clarity */
+:root{--g:#172b46;--g2:#274568;--mint:#edf2f8;--gold:#d7b879;--bg:#f4f6fa;--ink:#202b3b;--muted:#68768a;--line:#dfe5ee;--red:#a33c32;--surface:#fff;--shadow:0 10px 30px rgba(23,43,70,.07)}
+body{background:linear-gradient(180deg,#eaf0f7 0,#f5f7fa 270px);color:var(--ink)}
+.top{background:linear-gradient(112deg,#12233c 0%,#203b5e 58%,#2d4d70 100%);box-shadow:0 5px 22px #12233c24}
+button{background:linear-gradient(135deg,#203b5e,#172b46);box-shadow:0 3px 8px #172b4615}
+button.alt{background:#fff;color:#203b5e;border-color:#d6dfeb}
+.nav button.active{background:linear-gradient(100deg,#e8eef7,#f4f7fb);border-color:#d5dfed;color:#172b46;box-shadow:inset 3px 0 0 #3e628c}
+.nav button:hover{background:#f1f5fa;color:#172b46}
+.head h2,.statnum{color:#172b46}
+.pill,.notice{background:#edf2f8;color:#274568}
+.developer-hero{background:linear-gradient(118deg,#142640 0%,#213e61 64%,#355778 100%);border-color:#304c6c;box-shadow:0 12px 30px #172b461c}
+.developer-hero .eyebrow{color:#e6cd95}
+input:focus,select:focus,textarea:focus{border-color:#496b96;box-shadow:0 0 0 3px #496b961b}
+.login{background:radial-gradient(ellipse at 15% 12%,#dce6f2 0,transparent 42%),radial-gradient(ellipse at 90% 90%,#e8e0d0 0,transparent 35%),linear-gradient(135deg,#eef2f8,#f8f7f3)}
+.loginbox{width:min(470px,100%);padding:34px;background:rgba(255,255,255,.97);border:1px solid #dfe5ee;border-radius:22px;box-shadow:0 24px 70px rgba(23,43,70,.14)}
+.loginbox .brand{gap:14px;padding-bottom:18px;border-bottom:1px solid #e9edf3}
+.loginbox .logo{width:58px;height:58px;min-width:58px;border-radius:17px;background:linear-gradient(145deg,#e4d2a8,#c5a76d);border:2px solid #fff;box-shadow:0 0 0 1px #d1bc8c,0 6px 15px #172b4620;color:#172b46;font-size:31px;font-weight:900;line-height:1}
+.loginbox .brand h1{font-size:18px;letter-spacing:.09em;color:#172b46!important}
+.loginbox .brand p{font-size:12px;color:#6b7788!important}
+.loginbox h2{margin:22px 0 4px;color:#172b46;font-size:27px;letter-spacing:-.035em}
+.loginbox>p{line-height:1.6}
+.loginbox button{min-height:46px;margin-top:20px;background:linear-gradient(115deg,#203b5e,#172b46)}
+.loginbox input{min-height:44px;background:#fbfcfe}
+@media(max-width:700px){.loginbox{padding:25px 21px;border-radius:18px}.loginbox .logo{width:52px;height:52px;min-width:52px}}
 </style></head><body><div id="app"><div class="loading">Loading Shayalana RMS…</div></div>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
