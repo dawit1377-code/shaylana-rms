@@ -247,5 +247,6 @@ document.addEventListener('click',async function(e){
   btn.disabled=false;btn.dataset.busy='0';btn.textContent=approveId?'Retry approval':cancelId?'Retry cancel':'Retry accept';
  }
 },true);
+const languageObserver=new MutationObserver(records=>{if(records.some(r=>r.type==='childList'||r.type==='characterData'))applyLanguage(document)});languageObserver.observe(document.getElementById('app'),{subtree:true,childList:true,characterData:true});
 await start();
 </script></body></html>
