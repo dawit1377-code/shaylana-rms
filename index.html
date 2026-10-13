@@ -113,6 +113,12 @@ input:focus,select:focus,textarea:focus{border-color:#496b96;box-shadow:0 0 0 3p
 #itf input,#itf textarea,#itf select{z-index:2;display:block;width:100%;min-width:0;opacity:1;visibility:visible;user-select:text;-webkit-user-select:text}
 #itf label{display:block;z-index:1;margin:5px 0}
 #iname,#idesc{background:#fff!important;color:#202b3b!important;border:1px solid #cbd5e1!important}
+
+/* Fix menu editor click/focus and prevent accidental overlay interception */
+#itf{position:relative;z-index:5;pointer-events:auto}
+#itf .full,#itf label{pointer-events:auto}
+#itf input:not([type=file]),#itf textarea,#itf select{position:relative;z-index:6;pointer-events:auto!important;opacity:1!important;visibility:visible!important;user-select:text!important;-webkit-user-select:text!important;background:#fff;color:#202b3b}
+#itf input:focus,#itf textarea:focus{outline:2px solid #547aa5;outline-offset:1px}
 </style></head><body><div id="app"><div class="loading">Loading Shayalana RMS…</div></div>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
