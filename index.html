@@ -273,7 +273,7 @@ else if(section==='orders'){const d=await Promise.all([load('orders','id,order_n
 if(currentRole==='cashier'){
   const tipCard=document.createElement('section');
   tipCard.className='card';
-  const tipWaiters=d[7].filter(w=>String(w.role||'').toLowerCase()==='waiter');
+  const tipWaiters=d[7].filter(w=>String(w.role||'').toLowerCase()==='waiter'&&String(w.display_name||'').trim().toLowerCase()!=='waiters');
   const shiftTipOrders=ownShift?d[0].filter(o=>o.cashier_shift_id===ownShift.id):[];
   const shiftTipByWaiter={};shiftTipOrders.forEach(o=>{if(o.waiter_user_id)shiftTipByWaiter[o.waiter_user_id]=(shiftTipByWaiter[o.waiter_user_id]||0)+Number(o.tip_amount||0)});
   const shiftWaiterRows=tipWaiters.map(w=>'<tr><td>'+esc(w.display_name||'Waiter')+'</td><td><b>'+money(shiftTipByWaiter[w.user_id]||0)+'</b></td></tr>');
