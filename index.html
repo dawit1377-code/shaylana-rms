@@ -361,8 +361,6 @@ if(detailImg.complete&&detailImg.naturalWidth===0)showImageFallback();
 $('#customerBack').onclick=()=>showItems(activeCategory.id);
 $('#customerDetailBack').onclick=()=>showItems(activeCategory.id);
 $('#customerDetailOrder').onclick=()=>openOrder(item.id);
-const detailOrder=$('#customerDetailOrder');
-detailOrder?.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 function openOrder(itemId){
 const item=catalogItems.find(x=>x.id===itemId);if(!item)return;
