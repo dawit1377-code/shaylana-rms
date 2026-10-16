@@ -336,7 +336,7 @@ c.__customerItemClickHandler=e=>{const orderButton=e.target.closest('[data-custo
 c.addEventListener('click',c.__customerItemClickHandler,true);
 c.querySelectorAll('[data-customer-detail]').forEach(card=>card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showItemDetails(card.getAttribute('data-customer-detail'))}}));
 c.querySelectorAll('[data-customer-view-details]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();showItemDetails(b.getAttribute('data-customer-view-details'))});
-c.querySelectorAll('[data-customer-order]').forEach(b=>b.onclick=e=>{e.stopPropagation();openOrder(b.dataset.customerOrder)});
+c.querySelectorAll('[data-customer-order]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();showItemDetails(b.dataset.customerOrder)});
 }
 function showItemDetails(itemId){
 const item=catalogItems.find(x=>x.id===itemId);if(!item||!activeCategory)return;
