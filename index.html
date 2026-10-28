@@ -527,7 +527,44 @@ async function setSystemStopped(stopped){const btn=$('#system-stop'),resume=$('#
 document.addEventListener('click',e=>{const b=e.target.closest?.('#health-refresh,#system-stop,#system-resume');if(!b)return;if(b.id==='health-refresh')runSystemHealthCheck();if(b.id==='system-stop')setSystemStopped(true);if(b.id==='system-resume')setSystemStopped(false)});
 const maintenanceStatusPoll=setInterval(()=>{if(profile?.role&&String(profile.role).toLowerCase()==='developer'){const s=$('#system-state');if(s&&!s.textContent.includes('PAUSED')&&!s.textContent.includes('RUNNING'))s.textContent='Developer controls are available.'}},20000);
 let languageApplyQueued=false;const languageObserver=new MutationObserver(records=>{if(uiLang==='en'||languageApplyQueued||!records.some(r=>r.type==='childList'))return;languageApplyQueued=true;setTimeout(()=>{languageApplyQueued=false;applyLanguage(document)},80)});languageObserver.observe(document.getElementById('app'),{subtree:true,childList:true});
-try{await Promise.race([start(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Startup timed out after 45 seconds while '+startupStage+'. The app is waiting for Supabase. Check the connection and retry.')),45000))])}catch(startError){console.error('Shayalana startup failed:',startError);const app=document.getElementById('app');if(app)app.innerHTML='<main style="max-width:720px;margin:40px auto;padding:24px"><div class="card"><h2>Workspace could not load</h2><p>The app could not finish connecting to your restaurant data. Your saved data has not been deleted.</p><div class="notice err" id="startup-error"></div><button id="startup-retry">Retry connection</button><button class="alt" id="startup-reload">Reload app</button></div></main>';const errNode=document.getElementById('startup-error');if(errNode)errNode.textContent=startError?.message||String(startError);document.getElementById('startup-retry')?.addEventListener('click',()=>location.reload());document.getElementById('startup-reload')?.addEventListener('click',()=>location.reload())}
+function showStartupFailure(startError){
+ console.error('Shayalana startup failed:',startError);
+ const app=document.getElementById('app');
+ if(!app)return;
+ app.innerHTML='<main style="max-width:720px;margin:40px auto;padding:24px"><div class="card"><h2>Workspace could not load</h2><p>The app could not finish connecting to your restaurant data. Your saved data has not been deleted.</p><div class="notice err" id="startup-error"></div><button id="startup-retry">Retry connection</button><button class="alt" id="startup-reload">Reload app</button></div></main>';
+ const errNode=document.getElementById('startup-error');
+ if(errNode)errNode.textContent=startError?.message||String(startError);
+ document.getElementById('startup-retry')?.addEventListener('click',()=>location.reload());
+ document.getElementById('startup-reload')?.addEventListener('click',()=>location.reload());
+}
+const startupPromise=start();
+try{
+ await Promise.race([
+  startupPromise,
+  new Promise((_,reject)=>setTimeout(()=>reject(new Error(
+   'Startup timed out after 45 seconds while '+startupStage+
+   '. The app is still waiting for Supabase.')),45000))
+ ]);
+}catch(startError){
+ if(String(startError?.message||'').startsWith('Startup timed out')){
+  console.warn('Shayalana startup is slow; keeping the original startup alive.');
+  const pending=document.createElement('div');
+  pending.id='startup-pending';
+  pending.style.cssText='position:fixed;left:16px;right:16px;bottom:16px;z-index:99999;padding:14px 16px;border:1px solid #d4b477;border-radius:12px;background:#fffdf7;color:#173c35;box-shadow:0 8px 28px #0002;font:14px system-ui;display:flex;align-items:center;gap:12px;justify-content:space-between';
+  pending.innerHTML='<span>Connection is taking longer than usual. Keep this tab open while the restaurant data loads.</span><button id="startup-pending-retry" style="pointer-events:auto;flex-shrink:0">Retry</button>';
+  document.body.appendChild(pending);
+  document.getElementById('startup-pending-retry')?.addEventListener(
+   'click',()=>location.reload());
+  startupPromise.then(()=>{
+   document.getElementById('startup-pending')?.remove();
+  }).catch(actualError=>{
+   document.getElementById('startup-pending')?.remove();
+   showStartupFailure(actualError);
+  });
+ }else{
+  showStartupFailure(startError);
+ }
+}
 if(String(profile?.role||'').toLowerCase()==='developer'){runSystemHealthCheck();const healthState=$('#system-state');if(healthState)healthState.textContent='System control ready.';$('#system-stop')?.addEventListener('click',()=>{});}
 startMaintenancePolling();
 </script></body></html>
