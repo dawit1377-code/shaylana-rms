@@ -420,20 +420,78 @@ document.querySelectorAll('[data-download-shift-report]').forEach(btn=>btn.oncli
   reportNode.style.cssText='position:fixed;left:0;top:0;width:1100px;max-width:none;padding:24px;background:#fff;color:#172a24;font:12px Arial,sans-serif;z-index:2147483647;display:block;visibility:visible;opacity:1;box-sizing:border-box;overflow:visible';
   reportNode.innerHTML='<h1 style="color:#153f35;margin:0">Shayalana Cafe &amp; Restaurant</h1><h2 style="color:#236554;margin:6px 0 14px">Detailed Shift Sales Report</h2><div style="line-height:1.8;margin:12px 0"><b>Order range:</b> '+esc(orderLabel)+'<br><b>Cashier:</b> '+esc(staffName(sh.cashier_user_id))+'<br><b>Shift ID:</b> '+esc(sh.id)+'<br><b>Shift status:</b> '+esc(sh.status)+'<br><b>Opened:</b> '+esc(new Date(sh.opened_at).toLocaleString())+'<br><b>Closed:</b> '+esc(sh.closed_at?new Date(sh.closed_at).toLocaleString():'—')+'<br><b>Opening cash:</b> ETB '+fmt(sh.opening_cash)+'<br><b>Counted cash:</b> ETB '+fmt(sh.closing_cash_counted)+'</div><table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:10px"><thead><tr><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Order</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Type</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Waiter</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Status</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Items</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Bill total</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Paid</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Tips</th></tr></thead><tbody>'+rows+'</tbody></table><h3 style="color:#236554">Payment breakdown</h3><table style="width:100%;border-collapse:collapse;font-size:10px"><tr><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Method</th><th style="border:1px solid #ccd8d0;padding:6px;background:#e6f4ec">Amount (ETB)</th></tr>'+methodRows+'</table><p style="font-weight:bold">Total payments: ETB '+fmt(totalPayments)+' | Waiter tips: ETB '+fmt(totalTips)+'</p><p style="color:#68756f">Confidential operational report · Generated '+esc(new Date().toLocaleString())+'</p>';
   document.body.appendChild(reportNode);
-  const ensureHtml2Pdf=async()=>{
-   if(window.html2pdf)return window.html2pdf;
+  const ensureJsPdf=async()=>{
+   if(window.jspdf?.jsPDF)return window.jspdf.jsPDF;
    await new Promise((resolve,reject)=>{
-    const existing=document.querySelector('script[data-shaylana-html2pdf]');
-    if(existing){if(window.html2pdf){resolve();return}if(existing.dataset.failed==='true'||existing.dataset.loaded==='true'){reject(new Error('The PDF download library did not initialize. Please retry.'));return}existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',()=>reject(new Error('The PDF download library could not be loaded. Check your internet connection and retry.')),{once:true});return}
-    const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';script.async=true;script.dataset.shaylanaHtml2pdf='1';script.onload=()=>{script.dataset.loaded='true';resolve()};script.onerror=()=>{script.dataset.failed='true';reject(new Error('The PDF download library could not be loaded. Check your internet connection and retry.'))};document.head.appendChild(script);
+    const existing=document.querySelector('script[data-shaylana-jspdf]');
+    if(existing){
+     if(window.jspdf?.jsPDF){resolve();return}
+     if(existing.dataset.failed==='true'||existing.dataset.loaded==='true'){reject(new Error('The PDF generator did not initialize. Please refresh and retry.'));return}
+     existing.addEventListener('load',resolve,{once:true});
+     existing.addEventListener('error',()=>reject(new Error('The PDF generator could not be loaded. Check your internet connection and retry.')),{once:true});
+     return;
+    }
+    const script=document.createElement('script');
+    script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.async=true;script.dataset.shaylanaJspdf='1';
+    script.onload=()=>{script.dataset.loaded='true';resolve()};
+    script.onerror=()=>{script.dataset.failed='true';reject(new Error('The PDF generator could not be loaded. Check your internet connection and retry.'))};
+    document.head.appendChild(script);
    });
-   if(!window.html2pdf)throw new Error('The PDF download library did not initialize. Please retry.');
-   return window.html2pdf;
+   if(!window.jspdf?.jsPDF)throw new Error('The PDF generator did not initialize. Please refresh and retry.');
+   return window.jspdf.jsPDF;
   };
-  const html2pdf=await ensureHtml2Pdf();
-  if(!reportNode.innerText.trim())throw new Error('The shift report has no visible content to export.');
-  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-  await html2pdf().set({margin:8,filename:filename,image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,letterRendering:true,windowWidth:1200,windowHeight:Math.max(900,reportNode.scrollHeight),scrollX:0,scrollY:0,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},pagebreak:{mode:['css','legacy']}}).from(reportNode).save();
+  const JsPDF=await ensureJsPdf();
+  const pdf=new JsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const pageWidth=pdf.internal.pageSize.getWidth(),pageHeight=pdf.internal.pageSize.getHeight(),margin=10;
+  const usableWidth=pageWidth-margin*2;
+  let y=margin;
+  const safeText=value=>String(value??'—').replace(/[\\u{10000}-\\u{10FFFF}]/gu,'?');
+  const addLine=(value,size=9,bold=false,color=[35,53,46],gap=4)=>{
+   pdf.setFont('helvetica',bold?'bold':'normal');pdf.setFontSize(size);pdf.setTextColor(...color);
+   const lines=pdf.splitTextToSize(safeText(value),usableWidth);
+   const lineHeight=size*0.42;
+   if(y+lines.length*lineHeight>pageHeight-margin){pdf.addPage();y=margin}
+   pdf.text(lines,margin,y);y+=lines.length*lineHeight+gap;
+  };
+  const drawTable=(headers,data,widths)=>{
+   const row=(cells,isHeader=false)=>{
+    pdf.setFont('helvetica',isHeader?'bold':'normal');pdf.setFontSize(isHeader?7.5:7);
+    const wrapped=cells.map((cell,i)=>pdf.splitTextToSize(safeText(cell),widths[i]-2));
+    const lineHeight=3.2,rowHeight=Math.max(7,...wrapped.map(lines=>lines.length*lineHeight+2));
+    if(y+rowHeight>pageHeight-margin){pdf.addPage();y=margin; if(!isHeader)row(headers,true);}
+    let x=margin;
+    wrapped.forEach((lines,i)=>{
+     if(isHeader){pdf.setFillColor(230,244,236);pdf.rect(x,y,widths[i],rowHeight,'F')}
+     pdf.setDrawColor(190,205,196);pdf.rect(x,y,widths[i],rowHeight);
+     pdf.setTextColor(25,42,34);pdf.text(lines,x+1,y+3.5);
+     x+=widths[i];
+    });
+    y+=rowHeight;
+   };
+   row(headers,true);
+   data.forEach(cells=>row(cells,false));
+   y+=3;
+  };
+  addLine('Shaylana Cafe & Restaurant',17,true,[21,63,53],2);
+  addLine('DETAILED SHIFT SALES REPORT',12,true,[35,101,84],5);
+  addLine('Order range: '+orderLabel+'    |    Cashier: '+staffName(sh.cashier_user_id),9,true);
+  addLine('Shift ID: '+sh.id+'    |    Status: '+sh.status,8);
+  addLine('Opened: '+(sh.opened_at?new Date(sh.opened_at).toLocaleString():'—')+'    |    Closed: '+(sh.closed_at?new Date(sh.closed_at).toLocaleString():'—'),8);
+  addLine('Opening cash: ETB '+fmt(sh.opening_cash)+'    |    Counted cash: ETB '+fmt(sh.closing_cash_counted),8);
+  y+=2;
+  drawTable(['Order','Type','Waiter','Status','Items','Bill total','Paid','Tips'],orders.map(o=>{
+   const bill=bills.find(x=>x.order_id===o.id),its=items.filter(i=>i.order_id===o.id);
+   return ['ORD-'+o.order_number,o.order_type,staffName(o.waiter_user_id),o.status,its.map(i=>i.item_name_snapshot+' x '+i.quantity+' @ '+fmt(i.unit_price)).join('; ')||'—',fmt(bill?.total),fmt(bill?paid(bill.id):0),fmt(o.tip_amount)];
+  }),[22,19,25,23,100,22,22,22]);
+  addLine('PAYMENT BREAKDOWN',11,true,[35,101,84],3);
+  drawTable(['Payment method','Amount (ETB)'],[...new Set(payments.map(p=>p.method||'Other'))].map(method=>[method,fmt(payments.filter(p=>(p.method||'Other')===method).reduce((n,p)=>n+Number(p.amount||0),0))]),[usableWidth*0.65,usableWidth*0.35]);
+  addLine('Total payments: ETB '+fmt(totalPayments)+'    |    Waiter tips: ETB '+fmt(totalTips),10,true,[21,63,53],5);
+  addLine('Confidential operational report - Generated '+new Date().toLocaleString(),7,false,[100,112,106],0);
+  const pageCount=pdf.internal.getNumberOfPages();
+  for(let page=1;page<=pageCount;page++){pdf.setPage(page);pdf.setFontSize(7);pdf.setTextColor(110,120,114);pdf.text('Page '+page+' of '+pageCount,pageWidth-margin,pageHeight-5,{align:'right'});}
+  pdf.save(filename);
+  await new Promise(resolve=>setTimeout(resolve,300));
   reportNode.remove();reportNode=null;
   if(['owner','admin'].includes(String(profile?.role||'').toLowerCase())){
    const nr=await db.from('admin_notifications').update({read_at:new Date().toISOString()}).eq('id',notificationId).eq('restaurant_id',restaurant.id);
