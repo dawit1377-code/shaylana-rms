@@ -395,7 +395,7 @@ document.querySelectorAll('[data-download-shift-report]').forEach(btn=>btn.oncli
   if(shR.error)throw shR.error;if(stR.error)throw stR.error;if(oR.error)throw oR.error;if(pR.error)throw pR.error;
   const sh=shR.data,orders=oR.data||[],payments=pR.data||[];
   const orderNumbers=orders.map(o=>Number(o.order_number)).filter(n=>Number.isFinite(n)&&n>0).sort((a,b)=>a-b);
-  const orderLabel=orderNumbers.length?'ORD '+orderNumbers[0]+' - ORD '+orderNumbers[orderNumbers.length-1]:'Shift Report - No Orders';
+  const orderLabel=orderNumbers.length?'ORD '+orderNumbers[0]+'- ORD '+orderNumbers[orderNumbers.length-1]:'Shift Report - No Orders';
   const filename=orderLabel+'.pdf';
   if(!confirm('Download the detailed shift report as "'+filename+'"?')){btn.disabled=false;btn.textContent='Download PDF';return}
   btn.textContent='Preparing PDF…';
