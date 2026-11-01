@@ -423,8 +423,8 @@ document.querySelectorAll('[data-download-shift-report]').forEach(btn=>btn.oncli
    if(window.html2pdf)return window.html2pdf;
    await new Promise((resolve,reject)=>{
     const existing=document.querySelector('script[data-shaylana-html2pdf]');
-    if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',()=>reject(new Error('The PDF download library could not be loaded. Check your internet connection and retry.')),{once:true});return}
-    const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';script.async=true;script.dataset.shaylanaHtml2pdf='1';script.onload=resolve;script.onerror=()=>reject(new Error('The PDF download library could not be loaded. Check your internet connection and retry.'));document.head.appendChild(script);
+    if(existing){if(window.html2pdf){resolve();return}if(existing.dataset.failed==='true'||existing.dataset.loaded==='true'){reject(new Error('The PDF download library did not initialize. Please retry.'));return}existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',()=>reject(new Error('The PDF download library could not be loaded. Check your internet connection and retry.')),{once:true});return}
+    const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';script.async=true;script.dataset.shaylanaHtml2pdf='1';script.onload=()=>{script.dataset.loaded='true';resolve()};script.onerror=()=>{script.dataset.failed='true';reject(new Error('The PDF download library could not be loaded. Check your internet connection and retry.'))};document.head.appendChild(script);
    });
    if(!window.html2pdf)throw new Error('The PDF download library did not initialize. Please retry.');
    return window.html2pdf;
