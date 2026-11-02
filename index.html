@@ -464,7 +464,7 @@ document.querySelectorAll('[data-download-shift-report]').forEach(btn=>btn.oncli
   const pageWidth=pdf.internal.pageSize.getWidth(),pageHeight=pdf.internal.pageSize.getHeight(),margin=10;
   const usableWidth=pageWidth-margin*2;
   let y=margin;
-  const safeText=value=>String(value??'—').replace(/[\\u{10000}-\\u{10FFFF}]/gu,'?');
+  const safeText=value=>String(value??'—').replace(/[\u{10000}-\u{10FFFF}]/gu,'?');
   const addLine=(value,size=9,bold=false,color=[35,53,46],gap=4)=>{
    pdf.setFont('helvetica',bold?'bold':'normal');pdf.setFontSize(size);pdf.setTextColor(...color);
    const lines=pdf.splitTextToSize(safeText(value),usableWidth);
