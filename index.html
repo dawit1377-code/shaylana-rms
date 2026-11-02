@@ -508,7 +508,19 @@ document.querySelectorAll('[data-download-shift-report]').forEach(btn=>btn.oncli
   addLine('Confidential operational report - Generated '+new Date().toLocaleString(),7,false,[100,112,106],0);
   const pageCount=pdf.internal.getNumberOfPages();
   for(let page=1;page<=pageCount;page++){pdf.setPage(page);pdf.setFontSize(7);pdf.setTextColor(110,120,114);pdf.text('Page '+page+' of '+pageCount,pageWidth-margin,pageHeight-5,{align:'right'});}
-  pdf.save(filename);
+  const pdfBlob=pdf.output('blob');
+  if(!(pdfBlob instanceof Blob)||pdfBlob.size<800){
+   throw new Error('The PDF report was generated without enough content. No blank PDF was downloaded; please retry and contact the administrator if this repeats.');
+  }
+  const downloadUrl=URL.createObjectURL(pdfBlob);
+  const downloadLink=document.createElement('a');
+  downloadLink.href=downloadUrl;
+  downloadLink.download=filename;
+  downloadLink.style.display='none';
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  downloadLink.remove();
+  setTimeout(()=>URL.revokeObjectURL(downloadUrl),60000);
   await new Promise(resolve=>setTimeout(resolve,300));
   reportNode.remove();reportNode=null;
   if(['owner','admin'].includes(String(profile?.role||'').toLowerCase())){
