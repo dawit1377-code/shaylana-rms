@@ -671,10 +671,30 @@ c.innerHTML=head('Purchase & stock management','Record supplier purchases, view 
 '<div id="ingform" style="scroll-margin-top:18px"></div>'+
 '<div class="stats">'+stat('Tracked ingredients',active.length,'Active stock items')+stat('Healthy stock',healthy.length,'Above minimum level')+stat('Low stock',low.length,'Needs replenishment')+stat('Out of stock',out.length,'No available quantity')+'</div>'+
 (canEdit?'<div class="card"><h3>1. Record a supplier purchase</h3><p class="muted">Enter the supplier and purchase date once, then add multiple stock items. Current stock is shown before the new quantity is received. Stock updates only after the purchase is saved.</p><form id="purchaseform" class="formgrid"><div><label>Supplier name *</label><input id="psupplier" required maxlength="160"></div><div><label>Contact person</label><input id="pcontact" maxlength="120"></div><div><label>Phone</label><input id="pphone" type="tel" maxlength="50"></div><div><label>Email</label><input id="pemail" type="email" maxlength="160"></div><div><label>Purchased date *</label><input id="pdate" type="date" required value="'+new Date().toISOString().slice(0,10)+'"></div><div><label>Invoice / receipt no.</label><input id="pinvoice" maxlength="100"></div><div class="full"><label>Purchase items</label><div id="purchase-lines"></div><button type="button" class="alt small" id="add-purchase-line">＋ Add another item</button></div><div class="full"><label>Notes</label><textarea id="pnotes" rows="2"></textarea></div><div class="full"><h3 id="ptotal">Purchase total: ETB 0.00</h3></div><div class="full"><button '+(!active.length?'disabled':'')+'>Save purchase & update stock</button></div></form><div id="purchasefeedback"></div>'+(active.length?'':'<div class="notice">Register your first stock item using “Add stock item” before recording a purchase.')+'</div>':'')+
-'<div class="card"><h3>2. Current stock status</h3><p class="muted">Balances increase when purchases are received and decrease automatically from saved menu recipes when a paid bill is closed.</p>'+table(['Item name','Measuring unit','QTY on stock','Minimum level','Stock status','Action'],active.map(i=>'<tr><td><b>'+esc(i.name)+'</b></td><td>'+esc(i.unit)+'</td><td><b>'+esc(i.quantity_on_hand)+'</b></td><td>'+esc(i.low_stock_threshold)+'</td><td><span class="pill">'+(Number(i.quantity_on_hand)<=0?'OUT OF STOCK':Number(i.quantity_on_hand)<=Number(i.low_stock_threshold)?'LOW STOCK':'HEALTHY')+'</span></td><td>'+(canEdit?'<button type="button" class="alt small" data-clear-stock="'+esc(i.id)+'">Clear</button>':'—')+'</td></tr>'),'No stock items have been registered.')+'</div>'+
+'<div class="card"><h3>2. Current stock status</h3><p class="muted">Balances increase when purchases are received and decrease automatically from saved menu recipes when a paid bill is closed.</p>'+table(['Item name','Measuring unit','QTY on stock','Minimum level','Stock status','Action'],active.map(i=>'<tr><td><b>'+esc(i.name)+'</b></td><td>'+esc(i.unit)+'</td><td><b>'+esc(i.quantity_on_hand)+'</b></td><td>'+esc(i.low_stock_threshold)+'</td><td><span class="pill">'+(Number(i.quantity_on_hand)<=0?'OUT OF STOCK':Number(i.quantity_on_hand)<=Number(i.low_stock_threshold)?'LOW STOCK':'HEALTHY')+'</span></td><td>'+(canEdit?'<div class="actions" style="margin:0"><button type="button" class="small" data-edit-stock="'+esc(i.id)+'">Edit</button><button type="button" class="alt small" data-clear-stock="'+esc(i.id)+'">Clear</button></div>':'—')+'</td></tr>'),'No stock items have been registered.')+'</div>'+
 '<div class="card"><h3>3. Purchase history</h3>'+table(['Purchased date','Supplier','Supplier contact','Invoice','Items · Qty · Unit price · Total','Purchase total'],d[2].map(p=>{const lines=d[3].filter(x=>x.purchase_id===p.id);return '<tr><td>'+esc(p.purchase_date)+'</td><td><b>'+esc(p.supplier_name)+'</b></td><td>'+esc([p.supplier_contact_person,p.supplier_phone,p.supplier_email].filter(Boolean).join(' · ')||'—')+'</td><td>'+esc(p.invoice_reference||'—')+'</td><td>'+lines.map(x=>{const ing=d[0].find(i=>i.id===x.ingredient_id);return '<div><b>'+esc(ing?.name||'Item')+'</b> × '+esc(x.quantity)+' '+esc(x.unit)+' · '+money2(x.unit_price)+' / unit · '+money2(x.line_total??(Number(x.quantity)*Number(x.unit_price)))+'</div>'}).join('')+'</td><td><b>'+money2(p.total_amount)+'</b></td></tr>'}),'No purchases recorded yet.')+'</div>'+
 (canEdit?'<div class="card"><h3>4. Reorder alerts</h3>'+table(['Item','QTY on stock','Minimum','Alert'],[...out,...low].map(i=>'<tr><td>'+esc(i.name)+'</td><td>'+esc(i.quantity_on_hand)+' '+esc(i.unit)+'</td><td>'+esc(i.low_stock_threshold)+'</td><td>'+(Number(i.quantity_on_hand)<=0?'OUT OF STOCK':'LOW STOCK')+'</td></tr>'),'All stock items are above their minimum levels.')+'</div>':'')+
-'<div class="card"><h3>5. Stock movement history</h3>'+table(['Date','Item','Movement','Quantity change','Reason'],d[1].slice(0,50).map(m=>'<tr><td>'+esc(new Date(m.created_at).toLocaleString())+'</td><td>'+esc(d[0].find(i=>i.id===m.ingredient_id)?.name||'Item')+'</td><td>'+esc(m.movement_type)+'</td><td>'+esc(m.quantity_change)+'</td><td>'+esc(m.reason||'—')+'</td></tr>'),'No stock movements yet.')+'</div>';
+'<div class="card"><h3>5. Stock movement history</h3><p class="muted">Recent stock receipts, recipe deductions and manual quantity adjustments.</p>'+table(['Date','Item','Movement','Quantity change','Reason'],d[1].slice(0,50).map(m=>'<tr><td>'+esc(new Date(m.created_at).toLocaleString())+'</td><td>'+esc(d[0].find(i=>i.id===m.ingredient_id)?.name||'Item')+'</td><td>'+esc(m.movement_type)+'</td><td>'+esc(m.quantity_change)+'</td><td>'+esc(m.reason||'—')+'</td></tr>'),'No stock movements yet.')+'</div>'+
+(isAdmin?'<div class="card"><h3>6. Clear stock movement history</h3><p class="muted">This permanently removes movement-history rows for this restaurant only. Stock balances, ingredients, recipes and purchase records remain unchanged.</p><button type="button" class="alt" id="clear-movement-history">Clear stock movement history</button><form id="clear-movement-form" class="formgrid hidden" style="margin-top:12px"><div class="full"><label>Admin account password *</label><input id="clear-movement-password" type="password" required autocomplete="current-password" placeholder="Re-enter your current password"></div><div class="full"><label><input id="clear-movement-confirm" type="checkbox" required> I understand this permanently deletes all stock movement history.</label></div><div class="full"><button id="clear-movement-submit" type="submit" style="background:#9b2c20">Verify password & clear history</button><button type="button" class="alt" id="cancel-clear-movement">Cancel</button></div></form><div id="clear-movement-result"></div></div>':'');
+c.querySelectorAll('[data-edit-stock]').forEach(btn=>btn.onclick=()=>{
+ if(!canEdit)return;
+ const item=d[0].find(x=>x.id===btn.dataset.editStock);
+ if(!item)return;
+ $('#ingform').innerHTML='<div class="card"><h3>Edit stock item: '+esc(item.name)+'</h3><form id="edit-stock-form" class="formgrid"><div><label>Item name *</label><input id="edit-stock-name" required maxlength="120" value="'+esc(item.name)+'"></div><div><label>Measuring unit *</label><input id="edit-stock-unit" required maxlength="30" value="'+esc(item.unit)+'"></div><div><label>Current QTY on stock *</label><input id="edit-stock-qty" type="number" min="0" step=".0001" required value="'+esc(item.quantity_on_hand)+'"></div><div><label>Minimum stock alert level *</label><input id="edit-stock-min" type="number" min="0" step=".0001" required value="'+esc(item.low_stock_threshold)+'"></div><div class="full"><p class="muted">If you change the current quantity, a corresponding adjustment will be saved in stock movement history automatically.</p><button id="save-stock-edit">Save changes</button> <button type="button" class="alt" id="cancel-stock-edit">Cancel</button></div></form></div>';
+ $('#ingform').scrollIntoView({behavior:'smooth',block:'start'});
+ $('#edit-stock-name')?.focus({preventScroll:true});
+ $('#cancel-stock-edit').onclick=()=>{$('#ingform').innerHTML=''};
+ $('#edit-stock-form').onsubmit=async e=>{
+  e.preventDefault();
+  const payload={p_restaurant_id:restaurant.id,p_ingredient_id:item.id,p_name:$('#edit-stock-name').value.trim(),p_unit:$('#edit-stock-unit').value.trim(),p_quantity:Number($('#edit-stock-qty').value),p_low_stock_threshold:Number($('#edit-stock-min').value)};
+  if(!payload.p_name||!payload.p_unit||!Number.isFinite(payload.p_quantity)||payload.p_quantity<0||!Number.isFinite(payload.p_low_stock_threshold)||payload.p_low_stock_threshold<0){note('Enter valid stock item details. Quantity and minimum level cannot be negative.',true);return}
+  const save=$('#save-stock-edit');save.disabled=true;save.textContent='Saving…';
+  const result=await db.rpc('rms_update_ingredient_stock',payload);
+  if(result.error){save.disabled=false;save.textContent='Save changes';note('Stock item was not updated: '+result.error.message,true);return}
+  note('Stock item updated. Any quantity change was recorded in movement history.');
+  await render();
+ };
+});
 c.querySelectorAll('[data-clear-stock]').forEach(btn=>btn.onclick=async()=>{
  if(!canEdit)return;
  const id=btn.dataset.clearStock,item=d[0].find(x=>x.id===id);
@@ -693,6 +713,28 @@ c.querySelectorAll('[data-clear-stock]').forEach(btn=>btn.onclick=async()=>{
   await render();
  }catch(err){btn.disabled=false;btn.textContent='Clear';alert('Could not clear this stock item: '+(err.message||String(err))+'. No record was deleted.');}
 });
+if($('#clear-movement-history')){
+ $('#clear-movement-history').onclick=()=>{
+  $('#clear-movement-form').classList.remove('hidden');
+  $('#clear-movement-password')?.focus();
+ };
+ $('#cancel-clear-movement').onclick=()=>{$('#clear-movement-form').classList.add('hidden');$('#clear-movement-password').value='';$('#clear-movement-confirm').checked=false};
+ $('#clear-movement-form').onsubmit=async e=>{
+  e.preventDefault();
+  if(!isAdmin)return;
+  if(!$('#clear-movement-confirm').checked){note('Confirm that you understand this action is permanent.',true);return}
+  if(!confirm('FINAL CONFIRMATION\\n\\nPermanently delete ALL stock movement history for this restaurant? Current stock balances, stock items, recipes and purchase records will remain unchanged. This cannot be undone.'))return;
+  const submit=$('#clear-movement-submit'),result=$('#clear-movement-result');
+  submit.disabled=true;submit.textContent='Verifying & clearing…';result.innerHTML='';
+  try{
+   const out=await db.functions.invoke('clear-selected-data',{body:{category:'stock_movements_all',password:$('#clear-movement-password').value}});
+   if(out.error)throw out.error;
+   if(out.data?.error)throw new Error(out.data.error);
+   result.innerHTML='<div class="notice">Stock movement history cleared successfully. Stock balances and purchase records were not changed.</div>';
+   await render();
+  }catch(err){result.innerHTML='<div class="notice err">'+esc(err.message||String(err))+'</div>';submit.disabled=false;submit.textContent='Verify password & clear history'}
+ };
+}
 function addPurchaseLine(){
  const row=document.createElement('div');row.className='formgrid';row.style.cssText='border:1px solid var(--line);padding:12px;margin:9px 0;border-radius:12px;align-items:end';
  row.innerHTML='<div><label>Item name *</label><select class="pl-ing" required>'+ingredientOptions+'</select></div><div><label>Measuring unit</label><input class="pl-unit" readonly placeholder="Auto-filled"></div><div><label>QTY on stock</label><input class="pl-stock" readonly placeholder="Select item"></div><div><label>QTY purchased *</label><input class="pl-qty" type="number" min="0.0001" step="0.0001" required></div><div><label>Unit price (ETB) *</label><input class="pl-price" type="number" min="0" step="0.01" value="0" required></div><div><label>Total price (ETB)</label><input class="pl-total" readonly value="0.00"></div><div><button type="button" class="alt small pl-remove">Remove item</button></div>';
