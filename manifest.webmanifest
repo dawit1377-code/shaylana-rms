@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Shaylana Cafe & Restaurant Management System",
+  "short_name": "Shaylana RMS",
+  "description": "Shaylana Cafe & Restaurant Management System",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f7f5",
+  "theme_color": "#153f35",
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
