@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153f35">
+  <meta name="description" content="Install Shaylana Cafe & Restaurant Management System on your phone.">
+  <title>Install Shaylana RMS</title>
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../app-icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Shaylana RMS">
+  <style>
+    :root{color-scheme:light;--green:#153f35;--gold:#d6ad55;--ink:#17231f;--muted:#63716b;--paper:#f4f7f5}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#e5eee9 0,var(--paper) 48%);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);min-height:100vh;display:grid;place-items:center;padding:24px}
+    main{width:min(100%,480px);background:#fff;border:1px solid #e4ebe7;border-radius:28px;padding:32px 26px;box-shadow:0 18px 55px #153f3514;text-align:center}
+    .logo{width:92px;height:92px;margin:0 auto 18px;display:block;border-radius:24px}
+    .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#718078}
+    h1{font-size:clamp(27px,7vw,36px);line-height:1.12;margin:10px 0;color:var(--green)}
+    .sub{color:var(--muted);line-height:1.6;margin:0 auto 24px;max-width:360px}
+    .platform{background:#f5f8f6;border:1px solid #e6ede9;border-radius:18px;padding:18px;text-align:left;margin:16px 0}
+    .platform h2{font-size:17px;margin:0 0 8px;color:var(--green)}
+    .platform p{font-size:14px;line-height:1.55;color:#53635b;margin:0}
+    .primary{display:block;width:100%;border:0;border-radius:14px;background:var(--green);color:#fff;padding:16px 20px;font-size:16px;font-weight:750;text-decoration:none;cursor:pointer;margin:18px 0 10px}
+    .secondary{display:block;color:var(--green);font-weight:700;text-decoration:none;padding:12px}
+    .note{font-size:12px;line-height:1.5;color:#7a8780;margin-top:18px}
+    .hidden{display:none!important}.step{display:flex;gap:12px;margin-top:10px;align-items:flex-start}.num{flex:0 0 25px;height:25px;border-radius:50%;background:#e7efe9;color:var(--green);font-weight:800;display:grid;place-items:center;font-size:13px}.step span:last-child{font-size:14px;line-height:1.5;color:#53635b}
+  </style>
+</head>
+<body>
+<main>
+  <img class="logo" src="../app-icon.svg" alt="Shaylana RMS app icon">
+  <div class="eyebrow">Official app installation</div>
+  <h1>Shaylana RMS</h1>
+  <p class="sub">Add the restaurant management system to your phone's Home Screen for quick, app-like access.</p>
+
+  <section id="android" class="platform hidden">
+    <h2>Install on Android</h2>
+    <p id="androidText">Tap the button below and confirm the installation when your browser asks.</p>
+    <button id="installButton" class="primary" type="button">Install Shaylana RMS</button>
+    <p id="androidFallback" class="hidden">If the install prompt does not appear, open this page in Chrome, tap the browser menu (⋮), then choose <b>Install app</b> or <b>Add to Home screen</b>.</p>
+  </section>
+
+  <section id="ios" class="platform hidden">
+    <h2>Install on iPhone</h2>
+    <div class="step"><span class="num">1</span><span>Open this page in <b>Safari</b> (not an in-app browser).</span></div>
+    <div class="step"><span class="num">2</span><span>Tap the <b>Share</b> icon.</span></div>
+    <div class="step"><span class="num">3</span><span>Choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</span></div>
+  </section>
+
+  <section id="other" class="platform hidden">
+    <h2>Install on your device</h2>
+    <p>Open this link on your Android phone or iPhone to see the correct installation steps. On a computer, you can open the RMS directly.</p>
+  </section>
+
+  <a class="primary" href="../">Open Shaylana RMS</a>
+  <a class="secondary" href="../">Already installed? Go to the system</a>
+  <p class="note">No App Store or Google Play download is required. Your device will ask you to confirm before adding the app. Your existing RMS login and data remain in the main system.</p>
+</main>
+<script>
+(function(){
+  var ua=navigator.userAgent||"";
+  var isIOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  var isAndroid=/Android/i.test(ua);
+  var android=document.getElementById("android"),ios=document.getElementById("ios"),other=document.getElementById("other");
+  var deferredPrompt=null,button=document.getElementById("installButton"),fallback=document.getElementById("androidFallback");
+  if(isAndroid){android.classList.remove("hidden");}
+  else if(isIOS){ios.classList.remove("hidden");}
+  else{other.classList.remove("hidden");}
+  if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("../service-worker.js",{scope:"../"}).catch(function(){});});}
+  window.addEventListener("beforeinstallprompt",function(event){event.preventDefault();deferredPrompt=event;button.classList.remove("hidden");fallback.classList.add("hidden");});
+  button.addEventListener("click",async function(){
+    if(!deferredPrompt){fallback.classList.remove("hidden");return;}
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt=null;
+    button.classList.add("hidden");
+  });
+  window.addEventListener("appinstalled",function(){button.textContent="App installed";button.disabled=true;});
+  if(isAndroid){fallback.classList.remove("hidden");button.classList.add("hidden");}
+})();
+</script>
+</body>
+</html>
