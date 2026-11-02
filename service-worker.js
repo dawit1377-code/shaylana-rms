@@ -1,5 +1,5 @@
-const CACHE_NAME='shaylana-rms-shell-v1';
-const APP_SHELL=['./','./index.html','./manifest.webmanifest','./app-icon.svg'];
+const CACHE_NAME='shaylana-rms-shell-v2';
+const APP_SHELL=['./','./index.html','./manifest.webmanifest','./app-icon.svg','./shaylana-s-icon.svg'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
 });
@@ -18,7 +18,7 @@ self.addEventListener('fetch',event=>{
     }).catch(()=>caches.match('./index.html')));
     return;
   }
-  if(['manifest.webmanifest','app-icon.svg'].some(name=>url.pathname.endsWith('/'+name))){
+  if(['manifest.webmanifest','app-icon.svg','shaylana-s-icon.svg'].some(name=>url.pathname.endsWith('/'+name))){
     event.respondWith(caches.match(request).then(cached=>cached||fetch(request)));
   }
 });
