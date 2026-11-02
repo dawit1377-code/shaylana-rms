@@ -660,19 +660,39 @@ const d=await Promise.all([
  load('ingredients','id,name,unit,quantity_on_hand,low_stock_threshold,active,created_at'),
  load('stock_movements','id,ingredient_id,movement_type,quantity_change,reason,created_at','created_at'),
  load('inventory_purchases','id,supplier_name,supplier_contact_person,supplier_phone,supplier_email,purchase_date,invoice_reference,notes,total_amount,created_at','created_at'),
- load('inventory_purchase_items','id,purchase_id,ingredient_id,quantity,unit,unit_price,line_total')
+ load('inventory_purchase_items','id,purchase_id,ingredient_id,quantity,unit,unit_price,line_total'),
+ load('recipes','id,ingredient_id,menu_item_id')
 ]);
 const role=String(profile?.role||'').toLowerCase(),canEdit=['owner','admin','stock_supervisor'].includes(role),isAdmin=['owner','admin'].includes(role);
 const active=d[0].filter(i=>i.active),low=active.filter(i=>Number(i.quantity_on_hand)>0&&Number(i.quantity_on_hand)<=Number(i.low_stock_threshold)),out=active.filter(i=>Number(i.quantity_on_hand)<=0),healthy=active.filter(i=>Number(i.quantity_on_hand)>Number(i.low_stock_threshold));
 const money2=n=>'ETB '+(Number(n)||0).toFixed(2);
 const ingredientOptions='<option value="" data-unit="" data-stock="">Select inventory item</option>'+active.map(i=>'<option value="'+i.id+'" data-unit="'+esc(i.unit)+'" data-stock="'+esc(i.quantity_on_hand)+'">'+esc(i.name)+'</option>').join('');
 c.innerHTML=head('Purchase & stock management','Record supplier purchases, view current stock, track purchase costs and monitor stock movements.',canEdit?'<button id="adding">＋ Add stock item</button>':'')+
+'<div id="ingform" style="scroll-margin-top:18px"></div>'+
 '<div class="stats">'+stat('Tracked ingredients',active.length,'Active stock items')+stat('Healthy stock',healthy.length,'Above minimum level')+stat('Low stock',low.length,'Needs replenishment')+stat('Out of stock',out.length,'No available quantity')+'</div>'+
 (canEdit?'<div class="card"><h3>1. Record a supplier purchase</h3><p class="muted">Enter the supplier and purchase date once, then add multiple stock items. Current stock is shown before the new quantity is received. Stock updates only after the purchase is saved.</p><form id="purchaseform" class="formgrid"><div><label>Supplier name *</label><input id="psupplier" required maxlength="160"></div><div><label>Contact person</label><input id="pcontact" maxlength="120"></div><div><label>Phone</label><input id="pphone" type="tel" maxlength="50"></div><div><label>Email</label><input id="pemail" type="email" maxlength="160"></div><div><label>Purchased date *</label><input id="pdate" type="date" required value="'+new Date().toISOString().slice(0,10)+'"></div><div><label>Invoice / receipt no.</label><input id="pinvoice" maxlength="100"></div><div class="full"><label>Purchase items</label><div id="purchase-lines"></div><button type="button" class="alt small" id="add-purchase-line">＋ Add another item</button></div><div class="full"><label>Notes</label><textarea id="pnotes" rows="2"></textarea></div><div class="full"><h3 id="ptotal">Purchase total: ETB 0.00</h3></div><div class="full"><button '+(!active.length?'disabled':'')+'>Save purchase & update stock</button></div></form><div id="purchasefeedback"></div>'+(active.length?'':'<div class="notice">Register your first stock item using “Add stock item” before recording a purchase.')+'</div>':'')+
-'<div class="card"><h3>2. Current stock status</h3><p class="muted">Balances increase when purchases are received and decrease automatically from saved menu recipes when a paid bill is closed.</p>'+table(['Item name','Measuring unit','QTY on stock','Minimum level','Stock status'],active.map(i=>'<tr><td><b>'+esc(i.name)+'</b></td><td>'+esc(i.unit)+'</td><td><b>'+esc(i.quantity_on_hand)+'</b></td><td>'+esc(i.low_stock_threshold)+'</td><td><span class="pill">'+(Number(i.quantity_on_hand)<=0?'OUT OF STOCK':Number(i.quantity_on_hand)<=Number(i.low_stock_threshold)?'LOW STOCK':'HEALTHY')+'</span></td></tr>'),'No stock items have been registered.')+'</div>'+
+'<div class="card"><h3>2. Current stock status</h3><p class="muted">Balances increase when purchases are received and decrease automatically from saved menu recipes when a paid bill is closed.</p>'+table(['Item name','Measuring unit','QTY on stock','Minimum level','Stock status','Action'],active.map(i=>'<tr><td><b>'+esc(i.name)+'</b></td><td>'+esc(i.unit)+'</td><td><b>'+esc(i.quantity_on_hand)+'</b></td><td>'+esc(i.low_stock_threshold)+'</td><td><span class="pill">'+(Number(i.quantity_on_hand)<=0?'OUT OF STOCK':Number(i.quantity_on_hand)<=Number(i.low_stock_threshold)?'LOW STOCK':'HEALTHY')+'</span></td><td>'+(canEdit?'<button type="button" class="alt small" data-clear-stock="'+esc(i.id)+'">Clear</button>':'—')+'</td></tr>'),'No stock items have been registered.')+'</div>'+
 '<div class="card"><h3>3. Purchase history</h3>'+table(['Purchased date','Supplier','Supplier contact','Invoice','Items · Qty · Unit price · Total','Purchase total'],d[2].map(p=>{const lines=d[3].filter(x=>x.purchase_id===p.id);return '<tr><td>'+esc(p.purchase_date)+'</td><td><b>'+esc(p.supplier_name)+'</b></td><td>'+esc([p.supplier_contact_person,p.supplier_phone,p.supplier_email].filter(Boolean).join(' · ')||'—')+'</td><td>'+esc(p.invoice_reference||'—')+'</td><td>'+lines.map(x=>{const ing=d[0].find(i=>i.id===x.ingredient_id);return '<div><b>'+esc(ing?.name||'Item')+'</b> × '+esc(x.quantity)+' '+esc(x.unit)+' · '+money2(x.unit_price)+' / unit · '+money2(x.line_total??(Number(x.quantity)*Number(x.unit_price)))+'</div>'}).join('')+'</td><td><b>'+money2(p.total_amount)+'</b></td></tr>'}),'No purchases recorded yet.')+'</div>'+
 (canEdit?'<div class="card"><h3>4. Reorder alerts</h3>'+table(['Item','QTY on stock','Minimum','Alert'],[...out,...low].map(i=>'<tr><td>'+esc(i.name)+'</td><td>'+esc(i.quantity_on_hand)+' '+esc(i.unit)+'</td><td>'+esc(i.low_stock_threshold)+'</td><td>'+(Number(i.quantity_on_hand)<=0?'OUT OF STOCK':'LOW STOCK')+'</td></tr>'),'All stock items are above their minimum levels.')+'</div>':'')+
-'<div class="card"><h3>5. Stock movement history</h3>'+table(['Date','Item','Movement','Quantity change','Reason'],d[1].slice(0,50).map(m=>'<tr><td>'+esc(new Date(m.created_at).toLocaleString())+'</td><td>'+esc(d[0].find(i=>i.id===m.ingredient_id)?.name||'Item')+'</td><td>'+esc(m.movement_type)+'</td><td>'+esc(m.quantity_change)+'</td><td>'+esc(m.reason||'—')+'</td></tr>'),'No stock movements yet.')+'</div><div id="ingform"></div>';
+'<div class="card"><h3>5. Stock movement history</h3>'+table(['Date','Item','Movement','Quantity change','Reason'],d[1].slice(0,50).map(m=>'<tr><td>'+esc(new Date(m.created_at).toLocaleString())+'</td><td>'+esc(d[0].find(i=>i.id===m.ingredient_id)?.name||'Item')+'</td><td>'+esc(m.movement_type)+'</td><td>'+esc(m.quantity_change)+'</td><td>'+esc(m.reason||'—')+'</td></tr>'),'No stock movements yet.')+'</div>';
+c.querySelectorAll('[data-clear-stock]').forEach(btn=>btn.onclick=async()=>{
+ if(!canEdit)return;
+ const id=btn.dataset.clearStock,item=d[0].find(x=>x.id===id);
+ if(!item)return;
+ if(d[4].some(recipe=>recipe.ingredient_id===id)){
+  alert('This stock item is used in a saved menu recipe. Remove it from the relevant recipe first, then clear the stock item. No data has been changed.');
+  return;
+ }
+ if(!confirm('Clear "'+item.name+'" from the active stock list? Its purchase and stock movement history will be preserved.'))return;
+ btn.disabled=true;btn.textContent='Clearing…';
+ try{
+  const result=await db.from('ingredients').update({active:false}).eq('id',id).eq('restaurant_id',restaurant.id).select('id,active').maybeSingle();
+  if(result.error)throw result.error;
+  if(!result.data)throw new Error('No stock item was updated. Check your access and try again.');
+  note('Stock item cleared from the active list. Purchase and movement history has been preserved.');
+  await render();
+ }catch(err){btn.disabled=false;btn.textContent='Clear';alert('Could not clear this stock item: '+(err.message||String(err))+'. No record was deleted.');}
+});
 function addPurchaseLine(){
  const row=document.createElement('div');row.className='formgrid';row.style.cssText='border:1px solid var(--line);padding:12px;margin:9px 0;border-radius:12px;align-items:end';
  row.innerHTML='<div><label>Item name *</label><select class="pl-ing" required>'+ingredientOptions+'</select></div><div><label>Measuring unit</label><input class="pl-unit" readonly placeholder="Auto-filled"></div><div><label>QTY on stock</label><input class="pl-stock" readonly placeholder="Select item"></div><div><label>QTY purchased *</label><input class="pl-qty" type="number" min="0.0001" step="0.0001" required></div><div><label>Unit price (ETB) *</label><input class="pl-price" type="number" min="0" step="0.01" value="0" required></div><div><label>Total price (ETB)</label><input class="pl-total" readonly value="0.00"></div><div><button type="button" class="alt small pl-remove">Remove item</button></div>';
@@ -687,6 +707,8 @@ function addPurchaseLine(){
 if($('#adding'))$('#adding').onclick=()=>{
  $('#ingform').innerHTML='<div class="card"><h3>Add stock item</h3><form id="if" class="formgrid"><div><label>Item name *</label><input id="in" required maxlength="120"></div><div><label>Measuring unit * (kg, g, L, ml, pcs)</label><input id="iu" required maxlength="30"></div><div><label>Opening QTY on stock</label><input id="iq" type="number" min="0" step=".0001" value="0" required></div><div><label>Low-stock alert level</label><input id="il" type="number" min="0" step=".0001" value="0" required></div><div class="full"><button>Save stock item</button></div></form></div>';
  $('#if').onsubmit=async e=>{e.preventDefault();const x=await db.from('ingredients').insert({restaurant_id:restaurant.id,name:$('#in').value.trim(),unit:$('#iu').value.trim(),quantity_on_hand:Number($('#iq').value),low_stock_threshold:Number($('#il').value),active:true});if(x.error)note(x.error.message,true);else{note('Stock item registered.');await render()}};
+ $('#ingform').scrollIntoView({behavior:'smooth',block:'start'});
+ $('#in')?.focus({preventScroll:true});
 };
 if($('#purchaseform')){
  addPurchaseLine();$('#add-purchase-line').onclick=addPurchaseLine;
