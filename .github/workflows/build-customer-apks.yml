@@ -1,10 +1,6 @@
 name: Build Shaylana customer APKs
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'android-native/**'
-      - '.github/workflows/build-customer-apks.yml'
 
 jobs:
   build:
