@@ -1,0 +1,20 @@
+{
+  "id": "./juices-app.html",
+  "name": "Juices / ጭማቂዎች",
+  "short_name": "Juices / ጭማቂዎች",
+  "description": "Juices / ጭማቂዎች customer ordering app for Shayalana Cafe & Restaurant.",
+  "start_url": "./juices-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eaf8e9",
+  "theme_color": "#15803d",
+  "icons": [
+    {
+      "src": "./juices-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
