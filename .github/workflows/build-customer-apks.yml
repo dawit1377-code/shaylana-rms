@@ -21,21 +21,27 @@ jobs:
         uses: android-actions/setup-android@v3
       - name: Install Android platform
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
-      - name: Prepare signing key
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      - name: Generate temporary APK signing key
         run: |
-          test -n "$KEYSTORE_BASE64" || { echo 'Missing repository secret ANDROID_KEYSTORE_BASE64'; exit 1; }
-          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/shaylana-release.jks"
-          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/shaylana-release.jks" >> "$GITHUB_ENV"
+          KEYSTORE="$RUNNER_TEMP/shaylana-temporary-release.jks"
+          STORE_PASSWORD="$(openssl rand -hex 24)"
+          KEY_PASSWORD="$(openssl rand -hex 24)"
+          keytool -genkeypair -noprompt -v \
+            -keystore "$KEYSTORE" \
+            -storepass "$STORE_PASSWORD" \
+            -alias shaylana-temporary \
+            -keypass "$KEY_PASSWORD" \
+            -keyalg RSA -keysize 2048 -validity 30 \
+            -dname "CN=Shaylana Cafe and Restaurant, OU=Customer Apps, O=Shaylana, L=Addis Ababa, ST=Addis Ababa, C=ET"
+          {
+            echo "ANDROID_KEYSTORE_PATH=$KEYSTORE"
+            echo "ANDROID_KEYSTORE_PASSWORD=$STORE_PASSWORD"
+            echo "ANDROID_KEY_ALIAS=shaylana-temporary"
+            echo "ANDROID_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
       - name: Build seven signed release APKs
         working-directory: android-native
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          test -n "$ANDROID_KEYSTORE_PASSWORD" && test -n "$ANDROID_KEY_ALIAS" && test -n "$ANDROID_KEY_PASSWORD"
           gradle --no-daemon assembleBreakfastRelease assembleLunchRelease assembleDinnerRelease assembleJuicesRelease assembleHotDrinksRelease assembleSoftDrinksRelease assembleCakeRelease
       - name: Collect APKs
         run: |
@@ -45,7 +51,7 @@ jobs:
       - name: Upload signed APK bundle
         uses: actions/upload-artifact@v4
         with:
-          name: shaylana-seven-production-signed-apks
+          name: shaylana-seven-simple-apks
           path: release-apks/*.apk
           if-no-files-found: error
           retention-days: 90
