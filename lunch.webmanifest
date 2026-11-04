@@ -1,0 +1,20 @@
+{
+  "id": "./lunch-app.html",
+  "name": "Lunch / ምሳ",
+  "short_name": "Lunch / ምሳ",
+  "description": "Lunch / ምሳ customer ordering app for Shayalana Cafe & Restaurant.",
+  "start_url": "./lunch-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff1dc",
+  "theme_color": "#b45309",
+  "icons": [
+    {
+      "src": "./lunch-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

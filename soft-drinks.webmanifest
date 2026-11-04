@@ -1,0 +1,20 @@
+{
+  "id": "./soft-drinks-app.html",
+  "name": "Soft Drinks / ለስላሳ መጠጦች",
+  "short_name": "Soft Drinks / ለስላሳ",
+  "description": "Soft Drinks / ለስላሳ መጠጦች customer ordering app for Shayalana Cafe & Restaurant.",
+  "start_url": "./soft-drinks-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#e8f6ff",
+  "theme_color": "#0369a1",
+  "icons": [
+    {
+      "src": "./soft-drinks-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

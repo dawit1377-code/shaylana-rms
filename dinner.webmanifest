@@ -1,0 +1,20 @@
+{
+  "id": "./dinner-app.html",
+  "name": "Dinner / እራት",
+  "short_name": "Dinner / እራት",
+  "description": "Dinner / እራት customer ordering app for Shayalana Cafe & Restaurant.",
+  "start_url": "./dinner-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eeedff",
+  "theme_color": "#4338ca",
+  "icons": [
+    {
+      "src": "./dinner-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
