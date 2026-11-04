@@ -1,0 +1,42 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.shaylana.tablet'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.shaylana.customer'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    flavorDimensions += 'customerMenu'
+    productFlavors {
+        breakfast { dimension 'customerMenu'; applicationIdSuffix '.breakfast'; resValue 'string', 'app_name', 'Shaylana Breakfast'; resValue 'string', 'launch_url', 'https://dawit1377-code.github.io/shaylana-rms/breakfast-app.html' }
+        lunch { dimension 'customerMenu'; applicationIdSuffix '.lunch'; resValue 'string', 'app_name', 'Shaylana Lunch'; resValue 'string', 'launch_url', 'https://dawit1377-code.github.io/shaylana-rms/lunch-app.html' }
+        dinner { dimension 'customerMenu'; applicationIdSuffix '.dinner'; resValue 'string', 'app_name', 'Shaylana Dinner'; resValue 'string', 'launch_url', 'https://dawit1377-code.github.io/shaylana-rms/dinner-app.html' }
+        juices { dimension 'customerMenu'; applicationIdSuffix '.juices'; resValue 'string', 'app_name', 'Shaylana Juices'; resValue 'string', 'launch_url', 'https://dawit1377-code.github.io/shaylana-rms/juices-app.html' }
+        hotDrinks { dimension 'customerMenu'; applicationIdSuffix '.hotdrinks'; resValue 'string', 'app_name', 'Shaylana Hot Drinks'; resValue 'string', 'launch_url', 'https://dawit1377-code.github.io/shaylana-rms/hot-drinks-app.html' }
+        softDrinks { dimension 'customerMenu'; applicationIdSuffix '.softdrinks'; resValue 'string', 'app_name', 'Shaylana Soft Drinks'; resValue 'string', 'launch_url', 'https://dawit1377-code.github.io/shaylana-rms/soft-drinks-app.html' }
+        cake { dimension 'customerMenu'; applicationIdSuffix '.cake'; resValue 'string', 'app_name', 'Shaylana Cake'; resValue 'string', 'launch_url', 'https://dawit1377-code.github.io/shaylana-rms/cake-app.html' }
+    }
+
+    signingConfigs {
+        release {
+            def ksPath = System.getenv('ANDROID_KEYSTORE_PATH')
+            if (ksPath) storeFile file(ksPath)
+            storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            keyAlias System.getenv('ANDROID_KEY_ALIAS')
+            keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+        debug { }
+    }
+}
