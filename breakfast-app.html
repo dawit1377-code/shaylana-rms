@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d97706">
+<meta name="application-name" content="Breakfast / ቁርስ">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Breakfast / ቁርስ">
+<link rel="manifest" href="./breakfast.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./breakfast-icon.svg">
+<title>Breakfast / ቁርስ · Shayalana</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fff4df;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{width:100%;height:100%;border:0;display:block;background:#fff}
+#starting{position:absolute;inset:0;display:grid;place-items:center;color:#d97706;font-weight:700}
+</style>
+</head>
+<body>
+<div id="starting">Opening Shayalana · Breakfast / ቁርስ…</div>
+<iframe id="app" title="Breakfast / ቁርስ" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<script>
+(function(){
+  var frame=document.getElementById('app');
+  var target=new URL('./index.html?customerApp=breakfast',window.location.href);
+  frame.addEventListener('load',function(){document.getElementById('starting').style.display='none';});
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(function(error){console.warn('App shell registration:',error);});
+  }
+  frame.src=target.href;
+})();
+</script>
+</body>
+</html>
