@@ -19,6 +19,10 @@ jobs:
           gradle-version: '8.9'
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: false
+      - name: Accept Android SDK licences
+        run: yes | sdkmanager --licenses
       - name: Install Android platform
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Generate temporary APK signing key
@@ -26,12 +30,12 @@ jobs:
           KEYSTORE="$RUNNER_TEMP/shaylana-temporary-release.jks"
           STORE_PASSWORD="$(openssl rand -hex 24)"
           KEY_PASSWORD="$(openssl rand -hex 24)"
-          keytool -genkeypair -noprompt -v \
-            -keystore "$KEYSTORE" \
-            -storepass "$STORE_PASSWORD" \
-            -alias shaylana-temporary \
-            -keypass "$KEY_PASSWORD" \
-            -keyalg RSA -keysize 2048 -validity 30 \
+          keytool -genkeypair -noprompt -v \\
+            -keystore "$KEYSTORE" \\
+            -storepass "$STORE_PASSWORD" \\
+            -alias shaylana-temporary \\
+            -keypass "$KEY_PASSWORD" \\
+            -keyalg RSA -keysize 2048 -validity 30 \\
             -dname "CN=Shaylana Cafe and Restaurant, OU=Customer Apps, O=Shaylana, L=Addis Ababa, ST=Addis Ababa, C=ET"
           {
             echo "ANDROID_KEYSTORE_PATH=$KEYSTORE"
@@ -46,7 +50,7 @@ jobs:
       - name: Collect APKs
         run: |
           mkdir -p release-apks
-          find android-native/app/build/outputs/apk -type f -name '*.apk' -path '*/release/*' -exec cp {} release-apks/ \;
+          find android-native/app/build/outputs/apk -type f -name '*.apk' -path '*/release/*' -exec cp {} release-apks/ \\
           test "$(find release-apks -maxdepth 1 -name '*.apk' | wc -l)" -eq 7
       - name: Upload signed APK bundle
         uses: actions/upload-artifact@v4
