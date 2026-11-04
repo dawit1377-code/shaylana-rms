@@ -1,0 +1,20 @@
+{
+  "id": "./breakfast-app.html",
+  "name": "Breakfast / ቁርስ",
+  "short_name": "Breakfast / ቁርስ",
+  "description": "Breakfast / ቁርስ customer ordering app for Shayalana Cafe & Restaurant.",
+  "start_url": "./breakfast-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff4df",
+  "theme_color": "#d97706",
+  "icons": [
+    {
+      "src": "./breakfast-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
