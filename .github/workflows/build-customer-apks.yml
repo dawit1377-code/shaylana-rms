@@ -17,14 +17,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Set up Android SDK and accept licences
-        uses: android-actions/setup-android@v3
-        with:
-          accept-android-sdk-licenses: true
-      - name: Accept remaining Android SDK licences
-        run: yes | sdkmanager --licenses
-      - name: Install Android platform
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Accept Android SDK licences and install required SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
       - name: Generate temporary APK signing key
         run: |
           KEYSTORE="$RUNNER_TEMP/shaylana-temporary-release.jks"
