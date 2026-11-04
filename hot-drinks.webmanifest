@@ -1,0 +1,20 @@
+{
+  "id": "./hot-drinks-app.html",
+  "name": "Hot Drinks / ትኩስ መጠጥ",
+  "short_name": "Hot Drinks / ትኩስ",
+  "description": "Hot Drinks / ትኩስ መጠጥ customer ordering app for Shayalana Cafe & Restaurant.",
+  "start_url": "./hot-drinks-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff0e8",
+  "theme_color": "#9a3412",
+  "icons": [
+    {
+      "src": "./hot-drinks-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
