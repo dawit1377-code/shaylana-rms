@@ -28,6 +28,7 @@ jobs:
           KEY_PASSWORD="$(openssl rand -hex 24)"
           keytool -genkeypair -noprompt -v \
             -keystore "$KEYSTORE" \
+            -storetype JKS \
             -storepass "$STORE_PASSWORD" \
             -alias shaylana-temporary \
             -keypass "$KEY_PASSWORD" \
