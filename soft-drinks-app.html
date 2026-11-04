@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0369a1">
+<meta name="application-name" content="Soft Drinks / ለስላሳ መጠጦች">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Soft Drinks / ለስላሳ">
+<link rel="manifest" href="./soft-drinks.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./soft-drinks-icon.svg">
+<title>Soft Drinks / ለስላሳ መጠጦች · Shayalana</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#e8f6ff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{width:100%;height:100%;border:0;display:block;background:#fff}
+#starting{position:absolute;inset:0;display:grid;place-items:center;color:#0369a1;font-weight:700}
+</style>
+</head>
+<body>
+<div id="starting">Opening Shayalana · Soft Drinks / ለስላሳ መጠጦች…</div>
+<iframe id="app" title="Soft Drinks / ለስላሳ መጠጦች" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<script>
+(function(){
+  var frame=document.getElementById('app');
+  var target=new URL('./index.html?customerApp=softdrinks',window.location.href);
+  frame.addEventListener('load',function(){document.getElementById('starting').style.display='none';});
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(function(error){console.warn('App shell registration:',error);});
+  }
+  frame.src=target.href;
+})();
+</script>
+</body>
+</html>
