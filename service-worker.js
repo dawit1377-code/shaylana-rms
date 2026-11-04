@@ -1,5 +1,10 @@
-const CACHE_NAME='shaylana-rms-shell-v2';
-const APP_SHELL=['./','./index.html','./manifest.webmanifest','./app-icon.svg','./shaylana-s-icon.svg'];
+const CACHE_NAME='shaylana-rms-shell-v3';
+const APP_SHELL=[
+  './','./index.html','./manifest.webmanifest','./app-icon.svg','./shaylana-s-icon.svg',
+  './breakfast-app.html','./lunch-app.html','./dinner-app.html','./juices-app.html','./hot-drinks-app.html','./soft-drinks-app.html','./cake-app.html',
+  './breakfast.webmanifest','./lunch.webmanifest','./dinner.webmanifest','./juices.webmanifest','./hot-drinks.webmanifest','./soft-drinks.webmanifest','./cake.webmanifest',
+  './breakfast-icon.svg','./lunch-icon.svg','./dinner-icon.svg','./juices-icon.svg','./hot-drinks-icon.svg','./soft-drinks-icon.svg','./cake-icon.svg'
+];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
 });
@@ -13,12 +18,18 @@ self.addEventListener('fetch',event=>{
   if(url.origin!==self.location.origin)return;
   if(request.mode==='navigate'){
     event.respondWith(fetch(request).then(response=>{
-      if(response&&response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put('./index.html',copy));}
+      if(response&&response.ok){
+        const copy=response.clone();
+        caches.open(CACHE_NAME).then(async cache=>{
+          await cache.put(request,copy);
+          if(url.pathname.endsWith('/index.html')||url.pathname.endsWith('/shaylana-rms/'))await cache.put('./index.html',response.clone());
+        });
+      }
       return response;
-    }).catch(()=>caches.match('./index.html')));
+    }).catch(()=>caches.match(request).then(cached=>cached||caches.match('./index.html'))));
     return;
   }
-  if(['manifest.webmanifest','app-icon.svg','shaylana-s-icon.svg'].some(name=>url.pathname.endsWith('/'+name))){
+  if(['manifest.webmanifest','app-icon.svg','shaylana-s-icon.svg'].some(name=>url.pathname.endsWith('/'+name))||/\.(webmanifest|svg)$/.test(url.pathname)){
     event.respondWith(caches.match(request).then(cached=>cached||fetch(request)));
   }
 });
