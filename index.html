@@ -225,6 +225,80 @@ input:focus,select:focus,textarea:focus{border-color:#496b96;box-shadow:0 0 0 3p
  .customer-experience-title .customer-title-am{font-size:12px!important}
 }
 
+
+/* Responsive customer portal: portrait, landscape, tablets and phones */
+.customer-catalog-view{width:100%;max-width:100%;min-width:0;min-height:calc(100vh - 110px);min-height:calc(100dvh - 110px);padding:clamp(10px,2.4vw,30px);overflow-x:hidden}
+.customer-catalog-top{width:100%;min-width:0;flex-wrap:wrap}
+.customer-catalog-heading{width:100%;padding-inline:clamp(2px,2vw,18px);margin:clamp(12px,2.5vh,24px) auto clamp(16px,3vh,28px)}
+.customer-category-grid,.customer-menu-grid{width:100%;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:clamp(9px,1.8vw,18px)}
+.customer-category-card,.customer-menu-card{min-width:0;width:100%}
+.customer-category-image{height:clamp(105px,17vw,220px)}
+.customer-menu-photo{height:clamp(115px,18vw,225px)}
+.customer-experience-grid{
+ display:grid!important;
+ grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr))!important;
+ grid-auto-flow:row!important;
+ grid-auto-columns:initial!important;
+ gap:clamp(8px,1.5vw,16px)!important;
+ width:100%!important;max-width:1400px!important;
+ overflow:visible!important;overflow-x:visible!important;
+ padding:8px 2px 14px!important;margin:16px auto 24px!important;
+}
+.customer-experience-card{
+ width:100%!important;min-width:0!important;min-height:0!important;
+ height:100%!important;flex:initial!important;
+}
+.customer-experience-photo{height:clamp(82px,12vw,145px)!important;min-height:0!important}
+.customer-experience-title{font-size:clamp(12px,1.5vw,17px)!important}
+.customer-experience-title .customer-title-am{font-size:clamp(11px,1.25vw,15px)!important}
+.customer-item-detail-layout{width:100%;min-width:0}
+.customer-item-detail-photo{min-width:0}
+.customer-item-detail-copy{min-width:0;padding-left:clamp(16px,2vw,30px)}
+.customer-order-overlay{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+@media(max-width:600px){
+ .customer-catalog-view{padding:10px;min-height:calc(100vh - 80px);min-height:calc(100dvh - 80px)}
+ .customer-catalog-top{align-items:center;gap:8px}
+ .customer-catalog-brand{min-width:0;flex:1}
+ .customer-catalog-brand small{white-space:normal}
+ .customer-back-button{flex:0 0 auto;padding:9px 12px}
+ .customer-category-grid,.customer-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .customer-category-image{height:clamp(96px,30vw,155px)}
+ .customer-menu-photo{height:clamp(100px,32vw,165px)}
+ .customer-experience-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ .customer-experience-photo{height:clamp(88px,27vw,135px)!important}
+ .customer-experience-subtitle{display:block!important;min-height:0}
+ .customer-experience-action{margin-top:auto!important}
+ .customer-menu-item-bottom{flex-direction:column;align-items:stretch}
+ .customer-menu-item-bottom button{width:100%}
+}
+@media(orientation:landscape) and (max-height:520px){
+ .customer-catalog-view{padding:8px 14px;min-height:100dvh}
+ .customer-catalog-top{margin-bottom:8px}
+ .customer-catalog-heading{margin:8px auto 12px}
+ .customer-catalog-heading h2{font-size:clamp(21px,4vh,32px);margin:5px 0}
+ .customer-catalog-heading p{font-size:12px}
+ .customer-category-grid,.customer-menu-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,165px),1fr));gap:9px}
+ .customer-category-image{height:clamp(76px,23vh,130px)}
+ .customer-menu-photo{height:clamp(82px,25vh,140px)}
+ .customer-experience-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr))!important;gap:8px!important;margin:8px auto 12px!important}
+ .customer-experience-photo{height:clamp(58px,17vh,88px)!important}
+ .customer-experience-card{padding-bottom:8px!important}
+ .customer-experience-subtitle{display:none!important}
+ .customer-item-detail-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .customer-item-detail-photo{height:calc(100dvh - 90px);min-height:180px}
+ .customer-item-detail-photo img{min-height:180px}
+}
+@media(min-width:900px) and (orientation:landscape){
+ .customer-experience-grid{grid-template-columns:repeat(7,minmax(0,1fr))!important}
+}
+@media(max-width:380px) and (orientation:portrait){
+ .customer-catalog-heading h2{font-size:clamp(21px,6vw,28px)}
+ .customer-category-name{font-size:14px;padding:10px 9px 4px}
+ .customer-category-arrow{padding:0 9px 11px}
+ .customer-menu-item-body{padding:9px}
+ .customer-menu-item-body h3{font-size:13px}
+}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="application-name" content="Shaylana RMS">
