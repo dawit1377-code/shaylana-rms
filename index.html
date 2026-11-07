@@ -299,6 +299,20 @@ input:focus,select:focus,textarea:focus{border-color:#496b96;box-shadow:0 0 0 3p
  .customer-menu-item-body h3{font-size:13px}
 }
 
+
+/* Prevent customer portal content from imposing a wider-than-screen grid track. */
+.customer-main{display:block!important;width:100%;max-width:100%;min-width:0;box-sizing:border-box;overflow-x:hidden}
+.customer-main>#content{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;overflow-x:hidden}
+.customer-main .customer-catalog-view{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;margin:0 auto;overflow-x:hidden}
+.customer-main .customer-catalog-heading{width:100%;max-width:100%;min-width:0;box-sizing:border-box;text-align:center;overflow-wrap:anywhere}
+.customer-main .customer-experience-grid{display:grid!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-flow:row!important;overflow:visible!important}
+.customer-main .customer-experience-card{width:100%!important;max-width:100%;min-width:0!important;flex:none!important;box-sizing:border-box}
+.customer-main .customer-experience-photo{width:100%;max-width:100%;object-fit:cover}
+.customer-main .customer-category-grid,.customer-main .customer-menu-grid{width:100%;max-width:100%;min-width:0;box-sizing:border-box;grid-template-columns:repeat(2,minmax(0,1fr))}
+.customer-main .customer-category-card,.customer-main .customer-menu-card{min-width:0;max-width:100%;box-sizing:border-box}
+@media(min-width:600px){.customer-main .customer-experience-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))!important}}
+@media(min-width:900px) and (orientation:landscape){.customer-main .customer-experience-grid{grid-template-columns:repeat(7,minmax(0,1fr))!important}}
+@media(max-width:380px){.customer-main .customer-catalog-view{padding:8px}.customer-main .customer-experience-grid{gap:8px!important}.customer-main .customer-experience-title{padding-inline:8px}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="application-name" content="Shaylana RMS">
