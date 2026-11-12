@@ -1038,7 +1038,7 @@ document.addEventListener('click',async function(e){
  e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();
  if(btn.dataset.busy==='1')return;
  const approveId=btn.getAttribute('data-approveorder'),cancelId=btn.getAttribute('data-cancelorder'),collectId=btn.getAttribute('data-waiteraccept');
- if(cancelId&&!['owner','admin'].includes(currentRole)){alert('Only the admin can cancel orders. Please contact the administrator.');return;}
+ if(cancelId&&!['owner','admin'].includes(String(profile?.role||'').toLowerCase())){alert('Only the admin can cancel orders. Please contact the administrator.');return;}
  const feedback=approveId?document.getElementById('approval-'+approveId):null;
  let reason=null;
  if(cancelId){reason=window.prompt('Enter the reason for cancelling this order:','');if(reason===null)return;if(!reason.trim()){alert('Please enter a cancellation reason.');return;}}
