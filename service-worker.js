@@ -1,4 +1,4 @@
-const CACHE_NAME='shaylana-rms-shell-v12';
+const CACHE_NAME='shaylana-rms-shell-v13';
 const APP_SHELL=[
   './','./index.html','./manifest.webmanifest','./app-icon.svg','./shaylana-s-icon.svg',
   './breakfast-app.html','./lunch-app.html','./dinner-app.html','./juices-app.html','./hot-drinks-app.html','./soft-drinks-app.html','./cake-app.html',
