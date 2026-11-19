@@ -568,7 +568,7 @@ form.onsubmit=async e=>{e.preventDefault();const quantity=Number(qty.value),note
 function showAdditionalOrderPrompt(en,am){
 c.innerHTML='<section class="customer-order-result"><div class="customer-result-icon">✓</div><h2>'+esc(en)+'</h2><p lang="am">'+esc(am)+'</p><div class="customer-additional-order-question"><h3>Would you like to order anything else?</h3><p lang="am">ተጨማሪ ትዕዛዝ መስጠት ይፈልጋሉ?</p><div class="customer-additional-order-actions"><button type="button" id="customerAdditionalYes">Yes / አዎ</button><button type="button" id="customerAdditionalNo">No / አይ</button></div></div></section>';
 $('#customerAdditionalYes').onclick=()=>showCategories();
-$('#customerAdditionalNo').onclick=()=>{showPortalMessage('Thank you for ordering with Shayalana!','በሻይላና ትዕዛዝ ስለሰጡን እናመሰግናለን!',false);setTimeout(showWelcome,3800)};
+$('#customerAdditionalNo').onclick=()=>{showPortalMessage('Thank You! We Received Your Order! Have a Nice Stay!','እናመሰግናለን! ትዕዛዝዎን ተቀብለናል! መልካም ቆይታ ይሁንልዎ!',false);setTimeout(showWelcome,3800)};
 }
 function showPortalMessage(en,am,isError){
 c.innerHTML='<section class="customer-order-result '+(isError?'customer-order-error':'')+'"><div class="customer-result-icon">'+(isError?'!':'✓')+'</div><h2>'+esc(en)+'</h2><p lang="am">'+esc(am)+'</p><button type="button" id="customerResultBack">Back / ተመለስ</button></section>';
